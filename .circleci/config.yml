@@ -1,5 +1,19 @@
 version: 2.1
 
+orbs:
+  aws-cli: circleci/aws-cli@4.1.1
+
+commands:
+    # Exercise - Rollback
+  destroy_environment:
+    steps:
+      - run:
+          name: Destroy environment
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+
 jobs:
   build-frontend:
     docker:
@@ -62,6 +76,46 @@ jobs:
             cd backend 
             npm install 
             npm run test
+
+  deploy-infrastructure: 
+    docker: 
+      - image: camazon/aws-cli
+    steps: 
+      - checkout
+      - run: 
+          name: Install packages 
+          command: |
+            sudo apt-get update 
+            sudo apt-get install -y tar gzip 
+      - run:
+          name: setup backend infrastructure
+          command: |      
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+              --tags project=udapeople 
+      - run:
+          name: setup frontend infrastructure
+          command: |        
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+              --tags project=udapeople     
+      - destroy_environment       
+      - run: 
+          name: Fetch EC2 instance IPs
+          command: |
+            aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Project,Values=udacity" \
+              --output text >> .circleci/ansible/inventory.txt
+      - persist_to_workspace: 
+          root: cdond-c3-projectstarter
+          paths: 
+            - .circleci/ansible/inventory.txt
+
 
 workflows:
   default:
