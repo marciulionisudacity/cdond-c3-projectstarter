@@ -134,8 +134,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags project=udapeople     
-      - destroy_environment       
+              --tags project=udapeople          
       - run: 
           name: Fetch EC2 instance IPs
           command: |
@@ -143,10 +142,11 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:Project,Values=udacity" \
               --output text >> .circleci/ansible/inventory.txt
-      - persist_to_workspace: 
-          root: cdond-c3-projectstarter
-          paths: 
-            - .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - cdond-c3-projectstarter/.circleci/ansible/inventory.txt
+      - destroy_environment 
 
 workflows:
   default:
@@ -160,4 +160,9 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
       - scan-backend: 
-          requires: [build-backend]      
+          requires: [build-backend] 
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]          
