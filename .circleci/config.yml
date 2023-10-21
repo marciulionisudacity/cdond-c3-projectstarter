@@ -144,7 +144,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - cdond-c3-projectstarter/.circleci/ansible/inventory.txt
+            - .circleci/ansible/inventory.txt
       - destroy_environment 
 
 workflows:
