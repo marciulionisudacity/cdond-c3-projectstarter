@@ -183,6 +183,7 @@ jobs:
       - run:
           name: Send migration status to kvdb.io OR memstash.io
           command: |   
+            echo "insecure" >> ~/.curlrc
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               curl https://kvdb.io/PxonyffH4zUEbGSb5ZsyAy/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
