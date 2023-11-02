@@ -145,7 +145,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - project/.circleci/ansible
       - destroy_environment 
 
   configure-infrastructure: 
@@ -164,11 +164,11 @@ jobs:
             apk add tar gzip
             pip install awscli
             echo "with .circle only:"
-            cat /tmp/.circleci/ansible/inventory.txt
+            cat /tmp/project/.circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i /tmp/project/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
 
   run-migrations: 
     docker:
