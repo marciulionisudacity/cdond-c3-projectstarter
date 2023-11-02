@@ -160,12 +160,26 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible \
-            apt add tar gzip \
+            apk add tar gzip \
             pip install awscli
       - run:
           name: Configure server
           command: |
             ansible-playbook -i tmp/inventory.txt configure-server.yml
+
+  # run-migrations: 
+  #     docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [backend-build]
+  #     - run:
+  #         name: Run migrations
+  #         command: | 
+  #           cd backend
+  #           npm install
+  #           npm run migrations > migrations_dump.txt
 
 workflows:
   default:
@@ -186,4 +200,6 @@ workflows:
             branches:
               only: [master]    
       - configure-infrastructure:
-          requires: [deploy-infrastructure]              
+          requires: [deploy-infrastructure]     
+      # - run-migrations:
+      #     requires: [configure-infrastructure]                   
