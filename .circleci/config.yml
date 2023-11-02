@@ -160,7 +160,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible \
-            apt-get install -y tar gzip \
+            apt-get install tar gzip \
             pip install awscli
       - run:
           name: Configure server
