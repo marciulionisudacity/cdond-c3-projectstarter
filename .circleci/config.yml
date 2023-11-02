@@ -163,6 +163,10 @@ jobs:
             apk add --update ansible 
             apk add tar gzip
             pip install awscli
+            echo "with project:"
+            cat project/.circleci/ansible/inventory.txt
+            echo "with .circle only:"
+            cat .circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
