@@ -163,14 +163,12 @@ jobs:
             apk add --update ansible 
             apk add tar gzip
             pip install awscli
-            echo "with project:"
-            cat project/.circleci/ansible/inventory.txt
             echo "with .circle only:"
             cat .circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i project/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
 
   run-migrations: 
     docker:
