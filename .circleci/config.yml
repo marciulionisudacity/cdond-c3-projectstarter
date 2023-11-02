@@ -165,7 +165,7 @@ jobs:
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i tmp/inventory.txt configure-server.yml
+            ansible-playbook -i tmp/inventory.txt .circleci/ansible/configure-server.yml
 
   run-migrations: 
     docker:
