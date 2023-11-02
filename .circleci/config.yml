@@ -156,7 +156,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["5a:39:ae:73:a3:44:b5:a8:91:88:42:cf:4e:8d:09:e4"]
       - attach_workspace:
-          at: ~/
+          at: /tmp
       - run:
           name: Install dependencies
           command: |
@@ -164,11 +164,11 @@ jobs:
             apk add tar gzip
             pip install awscli
             echo "with .circle only:"
-            cat ~/inventory.txt
+            cat /tmp/.circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i ~/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
 
   run-migrations: 
     docker:
@@ -198,7 +198,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/inventory.txt
+          at: ~/
       - run:
           name: Install dependencies
           command: |
