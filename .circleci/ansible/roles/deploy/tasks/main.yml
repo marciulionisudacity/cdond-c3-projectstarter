@@ -5,15 +5,14 @@
     upgrade: "yes"
 
 - name: Copy artifact.tar.gz into remotes
-  hosts: web
   copy:
-    src: ~/artifact.tar.gz
-    dest: ~/artifact.tar.gz
+    src: ~/project/artifact.tar.gz
+    dest: ~/download/artifact.tar.gz
 
 - name: Extract artifact.tar.gz into /backend
-  ansible.builtin.unarchive:
-    src: artifact.tar.gz
-    dest: /backend
+  unarchive:
+    src: ~/download/artifact.tar.gz
+    dest: ~/backend
 
 - name: start application
   become: true
