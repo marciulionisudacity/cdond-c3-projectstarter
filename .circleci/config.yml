@@ -381,7 +381,7 @@ jobs:
           at: /tmp
       - run: 
           name: get oldworkflowId
-          command: export OldWorkflowID="$(cat /tmp/project/oldworkflowid.txt)"
+          command: export OldWorkflowID=$(cat /tmp/project/oldworkflowid.txt)
       # - run: 
       #     name: run cleanup
       #     command: |
