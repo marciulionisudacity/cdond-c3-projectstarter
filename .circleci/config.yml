@@ -211,17 +211,17 @@ jobs:
             apk add tar
             apk add gzip
       - run:
-          name: Install npm
-          command: apk add npm
-      - run:
-          name: Install nodejs
-          command: apk add nodejs
-      - run:
-          name: Install ansible
-          command: apk add ansible
+          name: Install node and npm
+          command: |
+            apk add nodejs
+            apk add npm
       - run:
           name: Install awscli
-          command: pip install awscli
+          command: pip install awscli            
+      - run:
+          name: Install ansible
+          command: apk add --update ansible 
+
       # - attach_workspace:
       #     at: /tmp
       # - run:
