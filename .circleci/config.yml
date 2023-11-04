@@ -211,7 +211,6 @@ jobs:
             yum update
             yum install -y tar gzip
             yum install python
-            pip install awscli
             yum install ansible
             yum install nodejs npm
       - attach_workspace:
@@ -254,7 +253,6 @@ jobs:
             yum update
             yum install -y tar gzip
             yum install python
-            pip install awscli
             yum install ansible
             yum install nodejs npm  
       - run:
