@@ -354,9 +354,9 @@ jobs:
               echo OldWorkflowID: "${OldWorkflowID}" 
               echo "${OldWorkflowID}" >> oldworkflowid.txt
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - oldworkflowid.txt    
+            - project/oldworkflowid.txt    
 
       # - run:
       #     name: Promote to cloudfront
@@ -379,7 +379,7 @@ jobs:
           command: |
             yum install -y tar gzip 
       - attach_workspace:
-          at: .
+          at: ~/
       - run: |
           cat ~/oldworkflowid.txt
           # OldWorkflowID="$(cat ~/oldworkflowid.txt)"
