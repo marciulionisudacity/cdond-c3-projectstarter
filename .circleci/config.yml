@@ -205,8 +205,10 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp
       - run:
-          name: Install dependencies
+          name: Install tar an gzip
           command: |
             apk add tar
             apk add gzip
@@ -221,35 +223,32 @@ jobs:
       - run:
           name: Install ansible
           command: apk add --update ansible 
-
-      # - attach_workspace:
-      #     at: /tmp
-      # - run:
-      #     name: Get backend url
-      #     command: |
-      #       export BACKEND_IP=$(aws ec2 describe-instances \
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #         --output text)
-      #       export API_URL="http://${BACKEND_IP}:3030"
-      #       echo "Backend URL: ${API_URL}"
-      #       echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-      #       cat frontend/.env
-      # - run:
-      #     name: Deploy frontend objects
-      #     command: |
-      #       cd frontend
-      #       npm install
-      #       npm run build
-      #       tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-      #       aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # - destroy_environment    
-      # - revert_migration  
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "Backend URL: ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy_environment    
+      - revert_migration  
       # Here's where you will add some code to rollback on failure     
   
   deploy-backend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - add_ssh_keys:
@@ -257,13 +256,21 @@ jobs:
       - attach_workspace:
           at: /tmp  
       - run:
-          name: Install dependencies
+          name: Install tar an gzip
           command: |
-            yum update
-            yum install -y tar gzip
-            yum install python
-            yum install ansible
-            yum install nodejs npm  
+            apk add tar
+            apk add gzip
+      - run:
+          name: Install node and npm
+          command: |
+            apk add nodejs
+            apk add npm
+      - run:
+          name: Install awscli
+          command: pip install awscli            
+      - run:
+          name: Install ansible
+          command: apk add --update ansible  
       - run:
           name: Deploy backend
           command: |
@@ -282,24 +289,24 @@ jobs:
 workflows:
   default:
     jobs: 
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend: 
-      #     requires: [build-backend]    
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - scan-backend: 
-      #     requires: [build-backend] 
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]    
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]     
-      # - run-migrations:
-      #     requires: [configure-infrastructure]     
-      - deploy-frontend #:
-          # requires: [run-migrations]                        
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend: 
+          requires: [build-backend]    
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend: 
+          requires: [build-backend] 
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]    
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]     
+      - run-migrations:
+          requires: [configure-infrastructure]     
+      - deploy-frontend:
+          requires: [run-migrations]                        
