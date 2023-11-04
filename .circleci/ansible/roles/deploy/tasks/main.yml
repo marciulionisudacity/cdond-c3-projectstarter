@@ -16,11 +16,11 @@
     dest: /backend
 
 - name: start application
-  hosts: web
   become: true
   tasks:
     - name: Run application
       shell: |
+        cd backend
         npm install
         pm2 stop default
         pm2 start npm -- start
