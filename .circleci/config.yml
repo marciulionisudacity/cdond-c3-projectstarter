@@ -14,6 +14,15 @@ commands:
             aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
 
+  revert_migration:
+    steps:
+      - run:
+          name: Rever migration
+          when: on_fail
+          command: |
+            cd ~/project/backend
+            npm install
+            npm run migration:revert  
 jobs:
   build-frontend:
     docker:
@@ -141,7 +150,6 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -198,7 +206,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/
+          at: /tmp
       - run:
           name: Install dependencies
           command: |
@@ -217,12 +225,54 @@ jobs:
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo "Backend URL: ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy_environment    
+      - revert_migration  
       # Here's where you will add some code to rollback on failure     
+  
+  deploy-backend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["5a:39:ae:73:a3:44:b5:a8:91:88:42:cf:4e:8d:09:e4"]
+      - attach_workspace:
+          at: /tmp  
+      - run:
+          name: Install dependencies
+          command: |
+            yum update
+            yum install -y tar gzip
+            yum install python
+            pip install awscli
+            yum install ansible
+            yum install nodejs npm  
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            ## Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            echo "Contents  of the inventory.txt file is -------"
+            cat /tmp/project/.circleci/ansible/inventory.txt
+            ansible-playbook -i /tmp/project/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml    
+      - destroy_environment    
+      - revert_migration  
+
 workflows:
   default:
     jobs: 
@@ -244,4 +294,6 @@ workflows:
       - configure-infrastructure:
           requires: [deploy-infrastructure]     
       - run-migrations:
-          requires: [configure-infrastructure]                   
+          requires: [configure-infrastructure]     
+      - deploy-frontend:
+          requires: [run-migrations]                        

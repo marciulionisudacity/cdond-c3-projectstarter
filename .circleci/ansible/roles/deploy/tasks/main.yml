@@ -1,0 +1,26 @@
+---
+- name: "upgrade packages."
+  become: true
+  apt:
+    upgrade: "yes"
+
+- name: Copy artifact.tar.gz into remotes
+  hosts: web
+    copy:
+      src: ~/artifact.tar.gz
+      dest: ~/artifact.tar.gz
+
+- name: Extract artifact.tar.gz into /backend
+  ansible.builtin.unarchive:
+    src: artifact.tar.gz
+    dest: /backend
+
+- name: start application
+  hosts: web
+  become: true
+  tasks:
+    - name: Run application
+      shell: |
+        npm install
+        pm2 stop default
+        pm2 start npm -- start
