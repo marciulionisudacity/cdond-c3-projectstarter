@@ -210,7 +210,7 @@ jobs:
           command: |
             yum update
             yum install -y tar gzip
-            pip install ansible
+            yum install -y ansible
             yum install nodejs npm
       # - attach_workspace:
       #     at: /tmp
