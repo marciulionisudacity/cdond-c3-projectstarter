@@ -379,9 +379,9 @@ jobs:
           command: |
             yum install -y tar gzip 
       - attach_workspace:
-          at: ~/
+          at: /tmp
       - run: |
-          cat ~/oldworkflowid.txt
+          cat /tmp/oldworkflowid.txt
           # OldWorkflowID="$(cat ~/oldworkflowid.txt)"
           # echo "OldWorkflowID: ${OldWorkflowID}"
       # - run: 
