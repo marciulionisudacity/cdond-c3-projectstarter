@@ -202,16 +202,26 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
-            yum update
-            yum install -y tar gzip
-            pip3 install ansible
-            yum install nodejs npm
+            apk add tar
+            apk add gzip
+      - run:
+          name: Install npm
+          command: apk add npm
+      - run:
+          name: Install nodejs
+          command: apk add nodejs
+      - run:
+          name: Install ansible
+          command: apk add ansible
+      - run:
+          name: Install awscli
+          command: pip install awscli
       # - attach_workspace:
       #     at: /tmp
       # - run:
