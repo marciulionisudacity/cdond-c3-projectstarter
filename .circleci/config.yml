@@ -381,7 +381,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: |
-          OldWorkflowID=${cat oldworkflowid.txt)
+          OldWorkflowID=${cat oldworkflowid.txt}
           echo "OldWorkflowID: ${OldWorkflowID}"
       # - run: 
       #     name: run cleanup
