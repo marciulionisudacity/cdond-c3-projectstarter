@@ -390,11 +390,11 @@ jobs:
             then
               if aws s3 ls "s3://udapeople-${OldWorkflowID}" 2>&1 | grep 'NoSuchBucket' >/dev/null; then
                 echo "Bucket does not exist. Skipping deletion."  
-              # else
-              #   aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              #   aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              #   aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+                exit 0
               fi
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             fi
 
 workflows:
