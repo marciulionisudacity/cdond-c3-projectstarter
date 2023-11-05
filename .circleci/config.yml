@@ -371,68 +371,56 @@ jobs:
     docker: 
       - image: amazon/aws-cli
     steps:
-      # - checkout 
-      # - run: 
-      #     name: Install packages
-      #     command: |
-      #       yum install -y tar gzip 
-      # - attach_workspace:
-      #     at: /tmp
-      # - run: 
-      #     name: get oldworkflowId
-      #     command: export OldWorkflowID=$(cat /tmp/project/oldworkflowid.txt)
+      - checkout 
+      - run: 
+          name: Install packages
+          command: |
+            yum install -y tar gzip 
+      - attach_workspace:
+          at: /tmp
+      - run: 
+          name: get oldworkflowId
+          command: export OldWorkflowID=$(cat /tmp/project/oldworkflowid.txt)
       - run: 
           name: run cleanup
           command: |
-            # set +e
-            OldWorkflowID=1 #deleteme
-            # try
-            #   echo "I am here."
-            #   aws s3 ls "s3://udapeople-${OldWorkflowID}"
-            # catch 
-            #   echo "Cought error"
-            # if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
-            # then
-            #     aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-            #     aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-            #     aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-            # fi
-            # set -e
-
             if aws s3api head-bucket --bucket udapeople-${OldWorkflowID} 2>/dev/null; then
-              echo "Bucket exists"
+              echo "Bucket exists. Initiating deletion"
+                aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             else
               echo "Bucket does not exist"
             fi
 workflows:
   default:
     jobs: 
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend: 
-      #     requires: [build-backend]    
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - scan-backend: 
-      #     requires: [build-backend] 
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]    
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]     
-      # - run-migrations:
-      #     requires: [configure-infrastructure]     
-      # - deploy-frontend:
-      #     requires: [run-migrations]        
-      # - deploy-backend:
-      #     requires: [run-migrations]      
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]     
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      - cleanup #:
-          #requires: [cloudfront-update]                               
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend: 
+          requires: [build-backend]    
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend: 
+          requires: [build-backend] 
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]    
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]     
+      - run-migrations:
+          requires: [configure-infrastructure]     
+      - deploy-frontend:
+          requires: [run-migrations]        
+      - deploy-backend:
+          requires: [run-migrations]      
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]     
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]                               
