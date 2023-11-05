@@ -385,7 +385,7 @@ jobs:
           name: run cleanup
           command: |
             OldWorkflowID=1 #deleteme
-            
+
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
               if aws s3 ls "s3://udapeople-${OldWorkflowID}" 2>&1 | grep 'NoSuchBucket' >/dev/null; then
@@ -428,4 +428,4 @@ workflows:
       # - cloudfront-update:
       #     requires: [smoke-test]
       - cleanup:
-          requires: [cloudfront-update]                               
+          #requires: [cloudfront-update]                               
