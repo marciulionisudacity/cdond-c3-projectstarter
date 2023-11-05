@@ -388,16 +388,9 @@ jobs:
 
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
-              echo "I am here."
-              aws s3 ls "s3://udapeople-${OldWorkflowID}" &> /dev/null
-              if [ $? != 0 ]; then
-                echo "Bucket does not exist. Skipping deletion."  
-                exit 0
-              else
-                aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-                aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}" 
-              fi  
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive 2> /dev/null
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}" 2> /dev/null
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}" 2> /dev/null
             fi
 
 workflows:
