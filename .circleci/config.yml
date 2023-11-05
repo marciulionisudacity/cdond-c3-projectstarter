@@ -384,6 +384,7 @@ jobs:
       - run: 
           name: run cleanup
           command: |
+            set +e
             OldWorkflowID=1 #deleteme
 
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
@@ -398,7 +399,7 @@ jobs:
                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               fi  
             fi
-
+            set -e
 workflows:
   default:
     jobs: 
