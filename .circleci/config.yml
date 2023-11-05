@@ -390,7 +390,7 @@ jobs:
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
               echo "I am here."
-              if aws s3 ls "s3://udapeople-${OldWorkflowID}" 2>&1 | grep 'NoSuchBucket' >/dev/null; then
+              if aws s3 ls "s3://udapeople-${OldWorkflowID}" 2>/dev/null | grep 'NoSuchBucket' >/dev/null; then
                 echo "Bucket does not exist. Skipping deletion."  
               else
                 aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
