@@ -386,12 +386,11 @@ jobs:
           command: |
             # set +e
             OldWorkflowID=1 #deleteme
-            try
-              echo "I am here."
-              aws s3 ls "s3://udapeople-${OldWorkflowID}"
-            catch 
-              echo "Cought error"
-
+            # try
+            #   echo "I am here."
+            #   aws s3 ls "s3://udapeople-${OldWorkflowID}"
+            # catch 
+            #   echo "Cought error"
             # if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             # then
             #     aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
@@ -399,6 +398,12 @@ jobs:
             #     aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             # fi
             # set -e
+
+            if aws s3api head-bucket --bucket udapeople-${OldWorkflowID} 2>/dev/null; then
+              echo "Bucket exists"
+            else
+              echo "Bucket does not exist"
+            fi
 workflows:
   default:
     jobs: 
