@@ -381,7 +381,7 @@ jobs:
       - run: 
           name: run cleanup
           command: |
-            OldWorkflowID=${cat /tmp/project/oldworkflowid.txt}
+            OldWorkflowID=$(cat /tmp/project/oldworkflowid.txt)
             if aws s3api head-bucket --bucket udapeople-${OldWorkflowID} 2>/dev/null; then
               echo "Bucket exists. Initiating deletion"
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
